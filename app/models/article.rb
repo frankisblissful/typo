@@ -104,10 +104,10 @@ class Article < Content
     end
 
     def search_with_pagination(search_hash, paginate_hash)
-      
+
       state = (search_hash[:state] and ["no_draft", "drafts", "published", "withdrawn", "pending"].include? search_hash[:state]) ? search_hash[:state] : 'no_draft'
-      
-      
+
+
       list_function  = ["Article.#{state}"] + function_search_no_draft(search_hash)
 
       if search_hash[:category] and search_hash[:category].to_i > 0
@@ -120,6 +120,23 @@ class Article < Content
       eval(list_function.join('.'))
     end
 
+  end
+
+  def merge_with(other_id)
+    other_article = Article.find_by_id(other_id)
+    return false if other_article.nil?
+    other_article_comments = Comment.find_all_by_article_id(other_id)
+    puts other_article_comments
+    self.body = self.body + other_article.body
+    save
+    if other_article_comments.nil?
+    else
+      other_article_comments.each do |old_comment|
+        Comment.create!(:id => old_comment["id"], :type => old_comment[:type], :title => old_comment["title"], :author => old_comment["author"], :body => old_comment["body"], :excerpt => old_comment["excerpt"], :created_at => old_comment["created_at"], :updated_at => old_comment["updated_at"], :user_id => old_comment["user_id"], :guid => old_comment["guid"], :text_filter_id => old_comment["text_filter_id"], :whiteboard => old_comment["whiteboard"], :article_id => self.id, :email => old_comment["email"], :url => old_comment["url"], :ip => old_comment["p"], :blog_name => old_comment["blog_name"], :published => old_comment["published"], :published_at => old_comment["published_at"], :state => old_comment["state"], :status_confirmed => old_comment["status_confirmed"],)
+      end
+    end
+    other_article.destroy
+    self
   end
 
   def year_url
@@ -466,4 +483,6 @@ class Article < Content
     to = to - 1 # pull off 1 second so we don't overlap onto the next day
     return from..to
   end
+
+
 end
