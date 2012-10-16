@@ -97,6 +97,11 @@ Then /^the author for "(.*?)" should be the author for "(.*?)" or "(.*?)"$/ do |
   assert (article_to_eat.body.include? (article_to_eaten.body))
 end
 
+Then /^the article for comment "(.*?)" should be "(.*?)"$/ do |comment_id, article_title|
+  assert (Comment.find_by_id($1).article_id == Article.find_by_title($2).id)
+end
+
+
 Then /^the comments for "(.*?)" should be the comments for "(.*?)" and "(.*?)"$/ do |arg1, arg2, arg3|
   article_to_eat = Content.find_by_title(arg1)
   if(arg3==arg1)
