@@ -5,7 +5,7 @@
 
 <% end %>
 
-<% if @article.id%>
+<% if @article.id and (User.find_by_id(session[:user_id]).profile_id) == 1%>
   <h4><%= _("Merge Articles") %></h4>
   <%= form_tag "/admin/content/merge/#{@article.id}" do -%>
     <br/>
