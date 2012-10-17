@@ -69,7 +69,11 @@ end
 Given /the following comments exist/ do |comments_table|
   comments_table.hashes.each do |comments|
     article = Content.find_by_title(comments["article"])
+    if comments["date"]=='today'
+      comments["date"] = "#{Time.now.utc.to_date.year}/#{Time.now.utc.to_date.month}/#{Time.now.utc.to_date.mday}"
+    end
     visit "/#{comments["date"]}/#{article.permalink}"
+    puts current_url
     fill_in 'comment_author', :with => comments["author"]
     fill_in 'comment_body', :with => comments["body"]
     click_button 'comment'
@@ -140,6 +144,9 @@ Then /^the comments for "(.*?)" should be the following/ do |article_title, comm
     bodies << comment.body
   end
   comments_table.hashes.each do |comment|
+    if comment["date"]=='today'
+      comment["date"] = "#{Time.now.utc.to_date.year}/#{Time.now.utc.to_date.month}/#{Time.now.utc.to_date.mday}"
+    end
     assert authors.include?(comment["author"]) and bodies.include?(comment["body"])
   end
 end

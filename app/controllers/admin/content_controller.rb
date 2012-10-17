@@ -7,7 +7,7 @@ class Admin::ContentController < Admin::BaseController
   cache_sweeper :blog_sweeper
 
   def merge
-    if Article.find_by_id(params[:id]).merge_with(params[:article_id]["merge_with"])
+    if Article.find_by_id(params[:id]).merge_with(params["merge_with"])
       flash[:notice] = _("This article was merged successfully")
     else
       flash[:error] = _("The article in question does not exist")

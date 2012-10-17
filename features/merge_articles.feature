@@ -14,7 +14,7 @@ Background:
   |article|author|date| body |
   |Hello World!|bob|2012/06/09| Hello World! 1 |
   |Hello World!|modd|2012/06/09| Hello World! 2 |
-  |Bob-omb|boom|2012/10/16| Bob-omb 1 |
+  |Bob-omb|boom|today| Bob-omb 1 |
 
  Given the following accounts exist:
   | login | email | firstname | lastname |
@@ -46,6 +46,6 @@ Scenario: comments on each of the two original articles need to all carry over
     | author | date | body |
     | bob | 2012/06/09 | Hello World! 1 |
     | modd | 2012/06/09 | Hello World! 2 |
-    | boom | 2012/10/16 | Bob-omb 1 |
+    | boom | today | Bob-omb 1 |
 
   
