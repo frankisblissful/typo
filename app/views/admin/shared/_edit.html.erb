@@ -2,5 +2,5 @@
 <%= form_tag(form_action, :id => "#{form_type}_form", :enctype => "multipart/form-data", :class => className) do %>
 
   <%= render :partial => "form" %>
-
+    <%= text_field(:merge_with, :article_id)%>
 <% end %>
