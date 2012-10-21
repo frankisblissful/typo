@@ -73,7 +73,6 @@ Given /the following comments exist/ do |comments_table|
       comments["date"] = "#{Time.now.utc.to_date.year}/#{Time.now.utc.to_date.month}/#{Time.now.utc.to_date.mday}"
     end
     visit "/#{comments["date"]}/#{article.permalink}"
-    puts current_url
     fill_in 'comment_author', :with => comments["author"]
     fill_in 'comment_body', :with => comments["body"]
     click_button 'comment'
