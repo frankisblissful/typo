@@ -24,12 +24,38 @@ And /^I am logged into the admin panel$/ do
   end
 end
 
+And /^I log in as "(.*)"$/ do |login|
+  visit '/accounts/login/'
+  fill_in 'user_login', :with => "#{login}"
+  fill_in 'user_password', :with => '67crystal76'
+  click_button 'Login'
+  if page.respond_to? :should
+    page.should have_content('Login successful')
+  else
+    assert page.has_content?('Login successful')
+  end
+end
+
+Given /^the following accounts exist/ do |accounts_table|
+  accounts_table.hashes.each do |account|
+    visit '/admin/users/new/'
+    fill_in 'user_login', :with => account["login"]
+    fill_in 'user_password', :with => "67crystal76"
+    fill_in 'user_password_confirmation', :with => "67crystal76"
+    fill_in 'user_email', :with => account["email"]
+    select 'Blog publisher', :from => 'user_profile_id'
+    fill_in 'user_firstname', :with => account["firstname"]
+    fill_in 'user_lastname', :with => account["lastname"]
+    click_button 'Save'
+  end
+end
+
 
 Given /the following articles exist/ do |articles_table|
   articles_table.hashes.each do |article|
     visit '/admin/content/new'
     fill_in 'article_title', :with => article["title"]
-    fill_in 'article__body_and_extended_editor', :with => "Lorem Ipsum"
+    fill_in 'article__body_and_extended_editor', :with => article["body"]
     click_button 'Publish'
     if page.respond_to? :should
       page.should have_content('Article was successfully created')
@@ -43,9 +69,13 @@ end
 Given /the following comments exist/ do |comments_table|
   comments_table.hashes.each do |comments|
     article = Content.find_by_title(comments["article"])
+    if comments["date"]=='today'
+      comments["date"] = "#{Time.now.utc.to_date.year}/#{Time.now.utc.to_date.month}/#{Time.now.utc.to_date.mday}"
+    end
     visit "/#{comments["date"]}/#{article.permalink}"
+    puts current_url
     fill_in 'comment_author', :with => comments["author"]
-    fill_in 'comment_body', :with => "comment blah blah blah Lorem Ipsum"
+    fill_in 'comment_body', :with => comments["body"]
     click_button 'comment'
   end
 
@@ -87,8 +117,10 @@ Then /^the title should be "(.*?)"$/ do |arg1|
  assert (not (Content.find_by_title(arg1).nil?))
 end
 
-Then /^the article "(.*?)" should contain the text from "(.*?)" and "(.*?)"$/ do |arg1, arg2, arg3|
-  pending # express the regexp above with the code you wish you had
+Then /^the article "(.*?)" should contain the text "(.*?)" and "(.*?)"$/ do |arg1, arg2, arg3|
+  art = Article.find_by_title(arg1)
+  assert art.body.include?(arg2)
+  assert art.body.include?(arg3)
 end
 
 Then /^the author for "(.*?)" should be the author for "(.*?)" or "(.*?)"$/ do |arg1, arg2, arg3|
@@ -102,14 +134,20 @@ Then /^the article for comment "(.*?)" should be "(.*?)"$/ do |comment_id, artic
 end
 
 
-Then /^the comments for "(.*?)" should be the comments for "(.*?)" and "(.*?)"$/ do |arg1, arg2, arg3|
-  article_to_eat = Content.find_by_title(arg1)
-  if(arg3==arg1)
-    article_to_eaten = Content.find_by_title(arg2)
-  else
-    article_to_eaten = Content.find_by_title(arg1)
+Then /^the comments for "(.*?)" should be the following/ do |article_title, comments_table|
+  article = Article.find_by_title(article_title)
+  comments = Comment.find_all_by_article_id(article.id)
+  authors = []
+  bodies = []
+  comments.each do |comment|
+    authors << comment.author
+    bodies << comment.body
   end
-  Comments.find_by_article_id(article_to_eaten.id).each do |article|
+  comments_table.hashes.each do |comment|
+    if comment["date"]=='today'
+      comment["date"] = "#{Time.now.utc.to_date.year}/#{Time.now.utc.to_date.month}/#{Time.now.utc.to_date.mday}"
+    end
+    assert authors.include?(comment["author"]) and bodies.include?(comment["body"])
   end
 end
 

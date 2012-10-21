@@ -4,3 +4,13 @@
   <%= render :partial => "form" %>
     <%= text_field(:merge_with, :article_id)%>
 <% end %>
+
+<% if @article.id and (User.find_by_id(session[:user_id]).profile_id) == 1%>
+  <h4><%= _("Merge Articles") %></h4>
+  <%= form_tag "/admin/content/merge/#{@article.id}" do -%>
+    <br/>
+    <input id="merge_with" name="merge_with" size="30" type="text" />
+    <%= hidden_field_tag 'this_id', @article.id %>
+    <%= submit_tag "Merge", :id => "Merge With This Article"%>
+  <% end %>
+<% end %>
