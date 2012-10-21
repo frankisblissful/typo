@@ -18,11 +18,15 @@ module NavigationHelpers
     when /^the new article page$/
       '/admin/content/new'
 
+    when /^the categories page$/
+      '/admin/categories/new'
+
     when /^the edit page for "(.*)"$/
       title = $1
       content_id = Content.find_by_title(title).id
       puts content_id
       "/admin/content/edit/#{content_id}"
+
     when /^the login page$/
       '/accounts/login'
 
